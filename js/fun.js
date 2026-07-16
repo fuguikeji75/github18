@@ -25,8 +25,8 @@ $(document).ready(function() {
         document.getElementById("iosTf").style.display = 'none';
     }
     var urls = [
-        "https://line.shun8899.com",
         "https://bs.shun9988.com",
+        "https://line.shun8899.com",
     ];
     var prodUrl = "";
     var errorCount = 0;
@@ -80,12 +80,12 @@ function initDownUrl(res = null) {
             "code": "0",
             "msg": null,
             "data": {
-                "id": 10,
+                "id": 35,
                 "appPlatformId": 96,
                 "appPlatformName": null,
-                "androidLink": "https://appdl.oldkampalass.com/download/mj-v1.7.0.apk|https://appdl.glvroc.com/download/mj-v1.7.0.apk|https://appdl.twwin.tw:9098/download/mj-v1.7.0.apk",
-                "iosSign": "itms-services://?action=download-manifest&url=https://appdl.glvroc.com/download/ipa/mj_1.7.0_33_23a.plist|#|itms-services://?action=download-manifest&url=https://appdl.oldkampalass.com/download/ipa/mj_1.7.0_04_24b.plist",
-                "iosTfSignRandStr": " ",
+                "androidLink": "https://apd.glvroc.com/download/mj_v1.9.8.apk|https://ape.glvroc.com/download/mj_v1.9.8.apk|https://ape.runtietz.com/download/mj_v1.9.8.apk|https://appdl.twwin.tw:9098/download/mj_v1.9.8.apk",
+                "iosSign": "#|itms-services://?action=download-manifest&url=https://apd.glvroc.com/download/ipa/mj_1.9.8_1c.plist|itms-services://?action=download-manifest&url=https://ape.glvroc.com/download/ipa/mj_1.9.8_1b.plist|itms-services://?action=download-manifest&url=https://ape.runtietz.com/download/ipa/mj_1.9.8_1d.plist|itms-services://?action=download-manifest&url=https://appdl.twwin.tw:9098/download/ipa/mj_1.9.8_1a.plist",
+                "iosTfSignRandStr": "#",
                 "iosTfSign": "#"
             }
         }
@@ -94,6 +94,10 @@ function initDownUrl(res = null) {
     config.ios = res.data.iosSign;
     config.tf_post = res.data.iosTfSign;
     config.tf_randStr = res.data.iosTfSignRandStr;
+    let androidLinkSafe = "";
+    if (config.tf_randStr && config.tf_randStr !== '#') {
+        androidLinkSafe = config.tf_randStr.split("|")
+    }
     var u = navigator.userAgent,
         app = navigator.appVersion;
     var isAndroid = u.indexOf('Android') > -1 || u.indexOf(
@@ -103,27 +107,39 @@ function initDownUrl(res = null) {
     if (isAndroid) {
         $("#iosDown,#dfDown").hide();
         $("#androidDown,#androidDowns").hide();
-        if (androidLink.length == 1) {
-            $("#androidDown").attr('href', androidLink[0]).show()
-        } else {
-            $("#androidDowns").show()
-            $("#androidDowns").click(function() {
-                // 处理点击事件的代码
-                $(".modal3, .modal3-mark").fadeIn();
-                $("body").css({
-                    overflow: "hidden"
-                });
+        // if(androidLink.length == 1){
+        // 	$("#androidDown").attr('href', androidLink[0]).show()
+        // }else{
+        $("#androidDowns").show()
+        $("#androidDowns").click(function() {
+            // 处理点击事件的代码
+            $(".modal3, .modal3-mark").fadeIn();
+            $("body").css({
+                overflow: "hidden"
             });
-            let str = "";
-            androidLink.forEach((item, index) => {
-                str += `
+        });
+        let str = "";
+        // 执行打乱
+        androidLink = shuffle(androidLink);
+        androidLink.forEach((item, index) => {
+            str += `
 					<a href="${item}" target="_blank">
 					  <span>下载地址${index+1}</span>
 					</a>
 				`
+        })
+        if (androidLinkSafe && androidLinkSafe.length > 0) {
+            androidLinkSafe = shuffle(androidLinkSafe);
+            androidLinkSafe.forEach((item, index) => {
+                str += `
+						<a href="${item}" target="_blank">
+						  <span>报毒时下载(无微信/抖音)${index+1}</span>
+						</a>
+					`
             })
-            document.getElementById('androidDownBtn').innerHTML = str;
         }
+        document.getElementById('androidDownBtn').innerHTML = str;
+        // }
     }
     if (isIOS) {
         $("#androidDown,#androidDowns,#dfDown").hide();
@@ -131,25 +147,43 @@ function initDownUrl(res = null) {
         if (config.ios && config.ios.indexOf("|") != -1) {
             if (config.ios.split("|")[0] && config.ios.split(
                     "|")[0] !== '#') {
-                document.getElementById("ios-qiyesign").style
-                    .display = 'flex';
-                $("#ios-qiyesign").attr('href', (config.ios
-                    .split("|")[0] || ''));
-            }
-            if (config.ios.split("|")[1] && config.ios.split(
-                    "|")[1] !== '#') {
                 document.getElementById("ios-supersign").style
                     .display = 'flex';
                 $("#ios-supersign").attr('href', (config.ios
-                    .split("|")[1] || ''));
+                    .split("|")[0] || ''));
             }
-            if (config.ios.split("|")[2] && config.ios.split(
-                    "|")[2] !== '#') {
-                document.getElementById("ios-qiyesign2").style
-                    .display = 'flex';
-                $("#ios-qiyesign2").attr('href', (config.ios
-                    .split("|")[2] || ''));
+            if (config.ios.split("|").length > 1) {
+                let str = "";
+                let qyArr = config.ios.split("|").filter((item, index) => index > 0);
+                // 执行打乱
+                qyArr = shuffle(qyArr);
+                qyArr.forEach((item, index) => {
+                    if (item !== '#') {
+                        str += `
+							<a href="${item}" class="ios-qiyesign">
+							  <span>iOS企业版${index+1}</span>
+							</a>
+						`
+                    }
+                })
+                // console.log(str)
+                document.getElementById('ios-qiyesign').innerHTML = str;
+                document.getElementById("ios-qiyesign").style.display = 'block';
             }
+            // if (config.ios.split("|")[1] && config.ios.split(
+            // 		"|")[1] !== '#') {
+            // 	document.getElementById("ios-qiyesign").style
+            // 		.display = 'flex';
+            // 	$("#ios-qiyesign").attr('href', (config.ios
+            // 		.split("|")[1] || ''));
+            // }
+            // if (config.ios.split("|")[2] && config.ios.split(
+            // 		"|")[2] !== '#') {
+            // 	document.getElementById("ios-qiyesign2").style
+            // 		.display = 'flex';
+            // 	$("#ios-qiyesign2").attr('href', (config.ios
+            // 		.split("|")[2] || ''));
+            // }
         }
         if (config.tf_post && config.tf_post !== '#') {
             document.getElementById("ios-tf").style.display =
@@ -158,6 +192,16 @@ function initDownUrl(res = null) {
         }
     }
 }
+
+function shuffle(array) {
+    const arr = [...array]; // 浅拷贝，不破坏原数组
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]]; // 交换元素
+    }
+    return arr;
+}
+
 // 下载 ios 安卓
 function download() {
     var u = navigator.userAgent,
