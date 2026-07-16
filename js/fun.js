@@ -25,8 +25,8 @@ $(document).ready(function() {
         document.getElementById("iosTf").style.display = 'none';
     }
     var urls = [
+        "https://line.shun8899.com",
         "https://bs.shun9988.com",
-        "https://bs.glvroc.com",
     ];
     var prodUrl = "";
     var errorCount = 0;
